@@ -28,17 +28,18 @@ export default class SchemParser {
     private error: string | null = null;
     private files: FileList;
 
-    private outputBuffer: ArrayBuffer | null = null;
+    private outputBuffer: Uint8Array;
 
     constructor(files: FileList) {
         this.files = files;
+        this.outputBuffer = new Uint8Array();
     }
 
     getError(): string | null {
       return this.error;
     }
     hasError(): boolean {
-      return this.error == null;
+      return this.error != null;
     }
     async tryConvertingSchemToSchematica() {
       try{
@@ -54,13 +55,19 @@ export default class SchemParser {
 
         const legacySchematic: ILegacySchem = new LegacySchematic();
 
+        moveSize(originalSchem, legacySchematic);
+        moveOffset(originalSchem, legacySchematic);
+        moveOrigin(originalSchem, legacySchematic);
+        movePallete(originalSchem, legacySchematic);
+        moveTileEntities(originalSchem, legacySchematic);
 
-        this.outputBuffer = (await NBT.write(legacySchematic, {rootName:"Schematic", compression:"gzip"}));
+        this.outputBuffer = await NBT.compress(await NBT.write(legacySchematic, {rootName:"Schematic"}), 'gzip');
 
       
         
       } catch(error) {
         console.log(error);
+        console.log("I do not have an error?");
         this.error = "Error parsing files";
       }
     }
@@ -72,8 +79,8 @@ export default class SchemParser {
       }
     }
 
-    getCompressedBlob(): ArrayBuffer {
-      throw new Error("Method not implemented.");
+    getCompressedBlob(): Uint8Array {
+      return this.outputBuffer;
     }
 
 }

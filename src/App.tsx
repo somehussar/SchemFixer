@@ -14,7 +14,7 @@ function App() {
 
   const [buttonState, setButtonState] = useState<boolean>(false);
 
-  const [outputBlob, setOutputBlob] = useState<Blob | null>(null);
+  const [outputBlob, setOutputBlob] = useState<Uint8Array | null>(null);
   const [fileURL, setFileURL] = useState<string | null>(null);
 
   async function onSubmit(event: FormEvent) {
@@ -35,23 +35,37 @@ function App() {
 
     const parser : SchemParser = new SchemParser(file.current.files);
 
-    await parser.tryConvertingSchemToSchematica();
-    if (parser.hasError()) {
-      setErrorMsg(parser.getError())
-      setButtonState(false);
-      return;
+    console.log("TEST");
+    try{
+      await parser.tryConvertingSchemToSchematica();
+      if (parser.hasError()) {
+        console.log("how do i have an error");
+        setErrorMsg(parser.getError())
+        setButtonState(false);
+        return;
+      }
+    } catch(e) {
+      console.log(e);
+    }
+    console.log("TEST OVER");
+
+    // await parser.tryCompressingFiles();
+    // if (parser.hasError()) {
+    //   setErrorMsg(parser.getError())
+    //   setButtonState(false);
+    //   return;
+    // }
+
+    console.log("A");
+    const output: Uint8Array = parser.getCompressedBlob();
+    console.log(output);
+    setOutputBlob(output);
+    if(output != null){
+      setFileURL(URL.createObjectURL(new Blob([output])));
+      setButtonState(true);
+      console.log("aaaa");
     }
 
-    await parser.tryCompressingFiles();
-    if (parser.hasError()) {
-      setErrorMsg(parser.getError())
-      setButtonState(false);
-      return;
-    }
-
-    // setOutputBlob(parser.getCompressedBlob());
-    // if(outputBlob != null)
-    //   setFileURL(URL.createObjectURL(outputBlob));
 
   }
 
