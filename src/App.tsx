@@ -8,7 +8,7 @@ import fileDownload from "js-file-download";
 
 function App() {
 
-  const [errorMsg, setErrorMsg] = useState<string>("");
+  const [errorMsg, setErrorMsg] = useState<string | null>("");
   
   const file = useRef<HTMLInputElement>(null);
 
@@ -17,7 +17,7 @@ function App() {
   const [outputBlob, setOutputBlob] = useState<Blob | null>(null);
   const [fileURL, setFileURL] = useState<string | null>(null);
 
-  function onSubmit(event: FormEvent) {
+  async function onSubmit(event: FormEvent) {
     event.preventDefault();
     setErrorMsg("");
 
@@ -35,23 +35,23 @@ function App() {
 
     const parser : SchemParser = new SchemParser(file.current.files);
 
-    parser.tryParsingFiles();
+    await parser.tryConvertingSchemToSchematica();
     if (parser.hasError()) {
       setErrorMsg(parser.getError())
       setButtonState(false);
       return;
     }
 
-    parser.tryCompressingFiles();
+    await parser.tryCompressingFiles();
     if (parser.hasError()) {
       setErrorMsg(parser.getError())
       setButtonState(false);
       return;
     }
 
-    setOutputBlob(parser.getCompressedBlob());
-    if(outputBlob != null)
-      setFileURL(URL.createObjectURL(outputBlob));
+    // setOutputBlob(parser.getCompressedBlob());
+    // if(outputBlob != null)
+    //   setFileURL(URL.createObjectURL(outputBlob));
 
   }
 
