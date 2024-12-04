@@ -4,7 +4,7 @@ import {ByteTag} from "nbtify/dist/tag"
 import LegacySchematic, { ILegacySchem as ILegacySchem } from './LegacySchematic';
 
 function moveSize(original : Readonly<NBT.NBTData>, newSchem: ILegacySchem) {
-
+  throw new Error("Moving size data");
 }
 
 function moveOffset(original : Readonly<NBT.NBTData>, newSchem: ILegacySchem) {
@@ -29,6 +29,7 @@ export default class SchemParser {
     private files: FileList;
 
     private outputBuffer: Uint8Array;
+    private name: string = "";
 
     constructor(files: FileList) {
         this.files = files;
@@ -43,10 +44,17 @@ export default class SchemParser {
     }
     async tryConvertingSchemToSchematica() {
       try{
-        console.log('a');
         const file = this.files.item(0);
         if (file == null) {
           return;
+        }
+
+        let name: string = file.name;
+        let lastIndex: number = name.lastIndexOf(".");
+        if(lastIndex != -1) {
+          this.name = name.substring(0, lastIndex) + "_converted.schematic";
+        } else {
+          this.name = name + "_converted.schematic";  
         }
 
         const buff: ArrayBuffer = await file.arrayBuffer();
@@ -67,20 +75,16 @@ export default class SchemParser {
         
       } catch(error) {
         console.log(error);
-        console.log("I do not have an error?");
-        this.error = "Error parsing files";
-      }
-    }
-    async tryCompressingFiles() {
-      try{
-
-      } catch(error) {
-        this.error = "Error compressing NBT";
+        this.error = "Error parsing files - " + (error + "").split(":")[1].substring(1);
       }
     }
 
     getCompressedBlob(): Uint8Array {
       return this.outputBuffer;
+    }
+
+    getName(): string {
+      return this.name;
     }
 
 }

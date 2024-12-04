@@ -1,7 +1,7 @@
 import "bootstrap/dist/css/bootstrap.min.css"
 import './App.css'
 import { Container, Form, Button, Col, Row } from 'react-bootstrap'
-import React, { FormEvent, useRef, useState } from "react"
+import React, { FormEvent, MutableRefObject, RefObject, useRef, useState } from "react"
 import SchemParser from "./converter/SchemParser";
 import axios from "axios";
 import fileDownload from "js-file-download";
@@ -10,21 +10,23 @@ function App() {
 
   const [errorMsg, setErrorMsg] = useState<string | null>("");
   
-  const file = useRef<HTMLInputElement>(null);
+  const file: RefObject<HTMLInputElement> = useRef<HTMLInputElement>(null);
 
   const [buttonState, setButtonState] = useState<boolean>(false);
 
-  const [outputBlob, setOutputBlob] = useState<Uint8Array | null>(null);
-  const [fileURL, setFileURL] = useState<string | null>(null);
+  const outputArray: MutableRefObject<Uint8Array | null> = useRef<Uint8Array | null>(null);
+  const fileURL: MutableRefObject<string | null> = useRef<string | null>(null);
+
+  let name: React.MutableRefObject<string> = useRef("");
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     setErrorMsg("");
 
-    setOutputBlob(null);
-    if(fileURL != null) {
-      URL.revokeObjectURL(fileURL);
-      setFileURL(null);
+    outputArray.current = null;
+    if(fileURL.current != null) {
+      URL.revokeObjectURL(fileURL.current);
+      fileURL.current = null;
     }
     
     if (file.current == null || file.current.files == null || file.current.files.length == 0) {
@@ -35,49 +37,37 @@ function App() {
 
     const parser : SchemParser = new SchemParser(file.current.files);
 
-    console.log("TEST");
-    try{
       await parser.tryConvertingSchemToSchematica();
       if (parser.hasError()) {
-        console.log("how do i have an error");
         setErrorMsg(parser.getError())
         setButtonState(false);
         return;
       }
-    } catch(e) {
-      console.log(e);
-    }
-    console.log("TEST OVER");
 
-    // await parser.tryCompressingFiles();
-    // if (parser.hasError()) {
-    //   setErrorMsg(parser.getError())
-    //   setButtonState(false);
-    //   return;
-    // }
+
 
     console.log("A");
     const output: Uint8Array = parser.getCompressedBlob();
     console.log(output);
-    setOutputBlob(output);
+    outputArray.current = null;
     if(output != null){
-      setFileURL(URL.createObjectURL(new Blob([output])));
+      fileURL.current = URL.createObjectURL(new Blob([output]));
       setButtonState(true);
-      console.log("aaaa");
+      name.current = parser.getName();
     }
 
 
   }
 
   function buttonClick(event: React.MouseEvent<HTMLButtonElement>) {
-    if(fileURL == null) {
+    if(fileURL.current == null) {
       return;
     }
-
-    axios.get(fileURL, {
+    axios.get(fileURL.current, {
       responseType: 'blob'
     }).then((res) => {
-      fileDownload(res.data, "output.schematic");
+      console.log(name);
+      fileDownload(res.data, name.current);
     })
   }
 
