@@ -2,7 +2,7 @@ import * as NBT from "nbtify";
 import LegacySchematic, { ILegacySchem as ILegacySchem } from './LegacySchematic';
 
 function moveSize(_original : Readonly<NBT.NBTData>, _newSchem: ILegacySchem) {
-  throw new Error("Moving size data");
+  // throw new Error("Moving size data");
 }
 
 function moveOffset(_original : Readonly<NBT.NBTData>, _newSchem: ILegacySchem) {
