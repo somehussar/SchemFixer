@@ -59,7 +59,7 @@ function App() {
 
   }
 
-  function buttonClick(event: React.MouseEvent<HTMLButtonElement>) {
+  function buttonClick(_event: React.MouseEvent<HTMLButtonElement>) {
     if(fileURL.current == null) {
       return;
     }

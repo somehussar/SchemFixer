@@ -1,25 +1,23 @@
-import jsonData from '../assets/lookuptable.json'
 import * as NBT from "nbtify";
-import {ByteTag} from "nbtify/dist/tag"
 import LegacySchematic, { ILegacySchem as ILegacySchem } from './LegacySchematic';
 
-function moveSize(original : Readonly<NBT.NBTData>, newSchem: ILegacySchem) {
+function moveSize(_original : Readonly<NBT.NBTData>, _newSchem: ILegacySchem) {
   throw new Error("Moving size data");
 }
 
-function moveOffset(original : Readonly<NBT.NBTData>, newSchem: ILegacySchem) {
+function moveOffset(_original : Readonly<NBT.NBTData>, _newSchem: ILegacySchem) {
 
 }
 
-function moveOrigin(original : Readonly<NBT.NBTData>, newSchem: ILegacySchem) {
+function moveOrigin(_original : Readonly<NBT.NBTData>, _newSchem: ILegacySchem) {
 
 }
 
-function moveTileEntities(original : Readonly<NBT.NBTData>, newSchem: ILegacySchem) {
+function moveTileEntities(_original : Readonly<NBT.NBTData>, _newSchem: ILegacySchem) {
 
 }
 
-function movePallete(original : Readonly<NBT.NBTData>, newSchem: ILegacySchem) {
+function movePallete(_original : Readonly<NBT.NBTData>, _newSchem: ILegacySchem) {
 
 }
 
