@@ -1,25 +1,5 @@
 import * as NBT from "nbtify";
-import LegacySchematic, { ILegacySchem as ILegacySchem } from './LegacySchematic';
-
-function moveSize(_original : Readonly<NBT.NBTData>, _newSchem: ILegacySchem) {
-  // throw new Error("Moving size data");
-}
-
-function moveOffset(_original : Readonly<NBT.NBTData>, _newSchem: ILegacySchem) {
-
-}
-
-function moveOrigin(_original : Readonly<NBT.NBTData>, _newSchem: ILegacySchem) {
-
-}
-
-function moveTileEntities(_original : Readonly<NBT.NBTData>, _newSchem: ILegacySchem) {
-
-}
-
-function movePallete(_original : Readonly<NBT.NBTData>, _newSchem: ILegacySchem) {
-
-}
+import LegacySchematic, { IModernRoot } from './SchematicFormats';
 
 
 export default class SchemParser {
@@ -57,15 +37,18 @@ export default class SchemParser {
 
         const buff: ArrayBuffer = await file.arrayBuffer();
 
-        const originalSchem: Readonly<NBT.NBTData> = Object.freeze(await NBT.read(buff));
+        const originalSchem: NBT.NBTData<IModernRoot> = await NBT.read<IModernRoot>(buff);
 
-        const legacySchematic: ILegacySchem = new LegacySchematic();
+        console.log(originalSchem);
 
-        moveSize(originalSchem, legacySchematic);
-        moveOffset(originalSchem, legacySchematic);
-        moveOrigin(originalSchem, legacySchematic);
-        movePallete(originalSchem, legacySchematic);
-        moveTileEntities(originalSchem, legacySchematic);
+        const legacySchematic: LegacySchematic = new LegacySchematic(originalSchem.data.Schematic);
+        console.log(legacySchematic);
+
+        // moveSize(originalSchem, legacySchematic);
+        // moveOffset(originalSchem, legacySchematic);
+        // moveOrigin(originalSchem, legacySchematic);
+        // movePallete(originalSchem, legacySchematic);
+        // moveTileEntities(originalSchem, legacySchematic);
 
         this.outputBuffer = await NBT.compress(await NBT.write(legacySchematic, {rootName:"Schematic"}), 'gzip');
 
