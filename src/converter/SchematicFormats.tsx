@@ -17,6 +17,16 @@ export type WEMeta = CompoundTag & {
     Origin: Int32Array;
 }
 
+export type ITileEntity = CompoundTag & {
+    x: IntTag | null;
+    y: IntTag | null;
+    z: IntTag | null;
+    id: any;
+
+    Pos?: IntArrayTag | null;
+    Id?: IntTag | null;
+}
+
 export type IModernRoot = CompoundTag & {
     Schematic: IModernSchem;
     Metadata: SchematicMetadata;
@@ -28,6 +38,7 @@ export type IModernRoot = CompoundTag & {
 
 export type IModernSchem = CompoundTag & {
     Blocks: BlockDataTag;
+    BlockEntities: Array<ITileEntity> | null;
     DataVersion: IntTag;
     Width: ShortTag;
     Height: ShortTag;
@@ -46,7 +57,7 @@ export interface ILegacySchem {
     Materials: string;
     Pallete: CompoundTag;
     PalleteMax: IntTag;
-    TileEntities: [];
+    TileEntities: Array<ITileEntity>;
     Version: IntTag;
     WEOffsetX: IntTag;
     WEOffsetY: IntTag;
@@ -67,7 +78,7 @@ export default class LegacySchematic implements ILegacySchem {
     public Materials: string = "Alpha";
     public Pallete: CompoundTag = {};
     public PalleteMax: IntTag = new Int32(0);
-    public TileEntities: [] = [];
+    public TileEntities = new Array<ITileEntity>;
     public Version: IntTag = new Int32(0);
     public WEOffsetX: IntTag = new Int32(0);
     public WEOffsetY: IntTag = new Int32(0);
@@ -84,6 +95,7 @@ export default class LegacySchematic implements ILegacySchem {
 
 
         // Copy offsets
+        console.log("COPYING OFFSETS");
         this.WEOffsetX = new Int32(modern.Offset[0]);
         this.WEOffsetY = new Int32(modern.Offset[1]);
         this.WEOffsetZ = new Int32(modern.Offset[2]);
@@ -95,6 +107,7 @@ export default class LegacySchematic implements ILegacySchem {
 
 
         // Copy origin
+        console.log("COPYING ORIGIN");
         if (modern.Metadata != null && modern.Metadata.WorldEdit != null && modern.Metadata.WorldEdit.Origin != null) {
             this.WEOriginX = new Int32(modern.Metadata.WorldEdit.Origin[0]);
             this.WEOriginY = new Int32(modern.Metadata.WorldEdit.Origin[1]);
@@ -119,6 +132,29 @@ export default class LegacySchematic implements ILegacySchem {
         }
 
 
+        // Move tile entities.
+        console.log("COPYING TILE ENTITIES")
+        if(modern.BlockEntities != null) {
+            this.TileEntities = modern.BlockEntities;
+            
+            for (let i = 0; i < this.TileEntities.length; i++) {
+                let tileEntity = this.TileEntities[i];
+
+                if(tileEntity.Pos != null) {
+                    tileEntity.x = new Int32(tileEntity.Pos[0]);
+                    tileEntity.y = new Int32(tileEntity.Pos[1]);
+                    tileEntity.z = new Int32(tileEntity.Pos[2]);
+                    
+                    delete tileEntity.Pos;
+                }
+
+                if(tileEntity.Id != null) {
+                    tileEntity.id = tileEntity.Id;
+
+                    delete tileEntity.Id;
+                }
+            }
+        }
 
 
     }
