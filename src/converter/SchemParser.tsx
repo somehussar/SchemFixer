@@ -1,5 +1,5 @@
 import * as NBT from "nbtify";
-import LegacySchematic, { IModernRoot, IModernSchem } from './SchematicFormats';
+import LegacySchematic, {IModernSchem } from './SchematicFormats';
 
 
 export default class SchemParser {
