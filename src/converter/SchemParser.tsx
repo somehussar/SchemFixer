@@ -1,5 +1,5 @@
 import * as NBT from "nbtify";
-import LegacySchematic, { IModernRoot } from './SchematicFormats';
+import LegacySchematic, { IModernRoot, IModernSchem } from './SchematicFormats';
 
 
 export default class SchemParser {
@@ -37,7 +37,7 @@ export default class SchemParser {
 
         const buff: ArrayBuffer = await file.arrayBuffer();
 
-        const originalSchem: NBT.NBTData<IModernRoot> = await NBT.read<IModernRoot>(buff);
+        const originalSchem: NBT.NBTData<IModernSchem> = await NBT.read<IModernSchem>(buff);
 
         console.log(originalSchem);
 

@@ -27,17 +27,8 @@ export type ITileEntity = CompoundTag & {
     Id?: IntTag | null;
 }
 
-export type IModernRoot = CompoundTag & {
-    Schematic: IModernSchem;
-    Metadata: SchematicMetadata;
-    WEOffsetX: IntTag | null;
-    WEOffsetY: IntTag | null;
-    WEOffsetZ: IntTag | null;
-    Offset: IntArrayTag | null;
-}
-
 export type IModernSchem = CompoundTag & {
-    Blocks: BlockDataTag;
+    BlockData: BlockDataTag;
     BlockEntities: Array<ITileEntity> | null;
     DataVersion: IntTag;
     Width: ShortTag;
@@ -45,6 +36,8 @@ export type IModernSchem = CompoundTag & {
     Length: ShortTag;
     Offset: IntArrayTag;
     Metadata: SchematicMetadata;
+    Pallete: CompoundTag;
+    PalleteMax: IntTag;
 }
 
 export interface ILegacySchem {
@@ -87,8 +80,8 @@ export default class LegacySchematic implements ILegacySchem {
     public WEOriginY: IntTag = new Int32(0);
     public WEOriginZ: IntTag = new Int32(0);
 
-    constructor(root: IModernRoot) {
-        const modern = root.Schematic;
+    constructor(root: IModernSchem) {
+        const modern = root;
         this.Width = modern.Width;
         this.Height = modern.Height;
         this.Length = modern.Length;
