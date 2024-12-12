@@ -41,7 +41,7 @@ export default class SchemParser {
 
         console.log(originalSchem);
 
-        const legacySchematic: LegacySchematic = new LegacySchematic(originalSchem.data.Schematic);
+        const legacySchematic: LegacySchematic = new LegacySchematic(originalSchem.data);
         console.log(legacySchematic);
 
         // moveSize(originalSchem, legacySchematic);

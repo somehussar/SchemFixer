@@ -10,10 +10,20 @@ export type SchematicMetadata = CompoundTag & {
     WEOffsetX: IntTag | null;
     WEOffsetY: IntTag | null;
     WEOffsetZ: IntTag | null;
+    WorldEdit: WEMeta | null;
 }
 
-export type IModernRoot = RootTag & {
+export type WEMeta = CompoundTag & { 
+    Origin: Int32Array;
+}
+
+export type IModernRoot = CompoundTag & {
     Schematic: IModernSchem;
+    Metadata: SchematicMetadata;
+    WEOffsetX: IntTag | null;
+    WEOffsetY: IntTag | null;
+    WEOffsetZ: IntTag | null;
+    Offset: IntArrayTag | null;
 }
 
 export type IModernSchem = CompoundTag & {
@@ -23,7 +33,7 @@ export type IModernSchem = CompoundTag & {
     Height: ShortTag;
     Length: ShortTag;
     Offset: IntArrayTag;
-    Metadata: CompoundTag;
+    Metadata: SchematicMetadata;
 }
 
 export interface ILegacySchem {
@@ -66,17 +76,50 @@ export default class LegacySchematic implements ILegacySchem {
     public WEOriginY: IntTag = new Int32(0);
     public WEOriginZ: IntTag = new Int32(0);
 
-    constructor(modern: IModernSchem) {
+    constructor(root: IModernRoot) {
+        const modern = root.Schematic;
         this.Width = modern.Width;
         this.Height = modern.Height;
         this.Length = modern.Length;
 
+
+        // Copy offsets
         this.WEOffsetX = new Int32(modern.Offset[0]);
         this.WEOffsetY = new Int32(modern.Offset[1]);
         this.WEOffsetZ = new Int32(modern.Offset[2]);
-        // @TODO: Add metadata conversion.
+        if(root.Metadata != null && root.Metadata.WEOffsetX != null && root.Metadata.WEOffsetY != null && root.Metadata.WEOffsetZ != null) {
+            this.WEOffsetX = root.Metadata.WEOffsetX;
+            this.WEOffsetY = root.Metadata.WEOffsetY;
+            this.WEOffsetZ = root.Metadata.WEOffsetZ;
+        }
 
-        
+
+        // Copy origin
+        if (modern.Metadata != null && modern.Metadata.WorldEdit != null && modern.Metadata.WorldEdit.Origin != null) {
+            this.WEOriginX = new Int32(modern.Metadata.WorldEdit.Origin[0]);
+            this.WEOriginY = new Int32(modern.Metadata.WorldEdit.Origin[1]);
+            this.WEOriginZ = new Int32(modern.Metadata.WorldEdit.Origin[2]);
+
+            // if (root.WEOffsetX != null && root.WEOffsetY != null && root.WEOffsetZ != null) {
+            //     this.WEOriginX = new Int32(root.WEOffsetX);
+
+            // }
+
+            if (this.WEOffsetX != null && this.WEOffsetY != null && this.WEOffsetZ != null) {
+                this.WEOriginX = new Int32(this.WEOffsetX.valueOf() + this.WEOriginX.valueOf());
+                this.WEOriginY = new Int32(this.WEOffsetY.valueOf() + this.WEOriginY.valueOf());
+                this.WEOriginZ = new Int32(this.WEOffsetZ.valueOf() + this.WEOriginZ.valueOf());
+                
+            }
+        }
+        if (root.Offset != null) {
+            this.WEOriginX = new Int32(root.Offset[0]);
+            this.WEOriginY = new Int32(root.Offset[1]);
+            this.WEOriginZ = new Int32(root.Offset[2]);
+        }
+
+
+
 
     }
     
